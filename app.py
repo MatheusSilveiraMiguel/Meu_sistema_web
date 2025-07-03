@@ -106,5 +106,13 @@ def excluir(indice):
             salvar_dados(lista)
     return redirect(url_for("index"))
 
+@app.route("/cancelar-repeticao/<int:indice>")
+def cancelar_repeticao(indice):
+    lista = carregar_dados()
+    if 0 <= indice < len(lista):
+        lista[indice]["repetir"] = False
+        salvar_dados(lista)
+    return redirect(url_for("index"))
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=False)

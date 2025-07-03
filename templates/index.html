@@ -16,41 +16,32 @@
             margin-bottom: 30px;
             color: #2c3e50;
         }
-        a.add-divida {
+        a.add-divida, a.ver-proximos {
             display: block;
-            width: 180px;
+            width: fit-content;
             margin: 0 auto 15px auto;
-            padding: 10px;
-            background-color: #27ae60;
+            padding: 10px 16px;
             color: white;
             font-weight: 700;
             text-align: center;
             border-radius: 6px;
             text-decoration: none;
             transition: background-color 0.3s ease;
+        }
+        a.add-divida {
+            background-color: #27ae60;
         }
         a.add-divida:hover {
             background-color: #219150;
         }
-        /* Botão para dívidas próximas */
         a.ver-proximos {
-            display: block;
-            width: 300px;
-            margin: 0 auto 25px auto;
-            padding: 10px;
             background-color: #f39c12;
-            color: white;
-            font-weight: 700;
-            text-align: center;
-            border-radius: 6px;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
         }
         a.ver-proximos:hover {
             background-color: #d68910;
         }
         ul {
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto;
             padding: 0;
             list-style: none;
@@ -64,54 +55,60 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
         }
         li strong {
             font-weight: 600;
             color: #2c3e50;
         }
         .info {
-            flex: 1;
+            flex: 1 1 100%;
+            margin-bottom: 10px;
         }
-        .btn-pagar {
-            background-color: #2980b9;
-            color: white;
-            padding: 8px 14px;
+        .acoes {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn-pagar, .btn-excluir, .btn-cancelar {
+            padding: 8px 12px;
             border-radius: 6px;
             text-decoration: none;
             font-weight: 600;
+            color: white;
             transition: background-color 0.3s ease;
-            margin-left: 20px;
             white-space: nowrap;
+        }
+        .btn-pagar {
+            background-color: #2980b9;
         }
         .btn-pagar:hover {
             background-color: #21649b;
         }
-        .paga {
-            color: green;
-            font-weight: 700;
-            margin-left: 20px;
-            white-space: nowrap;
-        }
         .btn-excluir {
             background-color: #c0392b;
-            color: white;
-            padding: 8px 14px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: background-color 0.3s ease;
-            margin-left: 15px;
-            white-space: nowrap;
         }
         .btn-excluir:hover {
             background-color: #992d22;
+        }
+        .btn-cancelar {
+            background-color: #7f8c8d;
+        }
+        .btn-cancelar:hover {
+            background-color: #616a6b;
+        }
+        .paga {
+            color: green;
+            font-weight: 700;
+            margin-left: 10px;
         }
     </style>
 </head>
 <body>
     <h1>📄 Lista de Dívidas</h1>
     <a href="{{ url_for('adicionar') }}" class="add-divida">➕ Adicionar nova dívida</a>
-    <a href="{{ url_for('vencimentos_proximos') }}" class="ver-proximos">Ver dívidas com vencimento em até 10 dias</a>
+    <a href="{{ url_for('vencimentos_proximos') }}" class="ver-proximos">🔔 Ver dívidas com vencimento em até 10 dias</a>
+
     <ul>
         {% for divida in dividas %}
             {% set i = loop.index0 %}
@@ -119,12 +116,17 @@
                 <div class="info">
                     <strong>{{ divida.nome }}</strong> - R$ {{ "%.2f"|format(divida.valor) }} - Vencimento: {{ divida.vencimento }} - Prioridade: {{ divida.prioridade }}
                 </div>
-                {% if divida.paga %}
-                    <span class="paga">✅ Paga</span>
-                    <a href="{{ url_for('excluir', indice=i) }}" class="btn-excluir" onclick="return confirm('Tem certeza que deseja excluir esta dívida?');">🗑️ Excluir</a>
-                {% else %}
-                    <a href="{{ url_for('pagar', indice=i) }}" class="btn-pagar">Marcar como paga</a>
-                {% endif %}
+                <div class="acoes">
+                    {% if divida.paga %}
+                        <span class="paga">✅ Paga</span>
+                        <a href="{{ url_for('excluir', indice=i) }}" class="btn-excluir" onclick="return confirm('Tem certeza que deseja excluir esta dívida?');">🗑️ Excluir</a>
+                    {% else %}
+                        <a href="{{ url_for('pagar', indice=i) }}" class="btn-pagar">✔️ Marcar como paga</a>
+                        {% if divida.repetir %}
+                            <a href="{{ url_for('cancelar_repeticao', indice=i) }}" class="btn-cancelar" onclick="return confirm('Deseja parar a repetição mensal desta dívida?');">⏹️ Parar de repetir</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
             </li>
         {% else %}
             <li>Nenhuma dívida cadastrada.</li>
