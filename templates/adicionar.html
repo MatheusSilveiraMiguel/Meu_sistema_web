@@ -40,6 +40,14 @@
             font-size: 1rem;
             box-sizing: border-box;
         }
+        .checkbox {
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .checkbox input {
+            margin-right: 8px;
+        }
         button {
             margin-top: 25px;
             width: 100%;
@@ -88,6 +96,11 @@
                 <option value="média">Média</option>
                 <option value="alta">Alta</option>
             </select>
+
+            <div class="checkbox">
+                <input type="checkbox" id="repetir" name="repetir">
+                <label for="repetir">Repetir todo mês</label>
+            </div>
 
             <button type="submit">Salvar</button>
         </form>

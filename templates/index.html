@@ -19,7 +19,7 @@
         a.add-divida {
             display: block;
             width: 180px;
-            margin: 0 auto 25px auto;
+            margin: 0 auto 15px auto;
             padding: 10px;
             background-color: #27ae60;
             color: white;
@@ -31,6 +31,23 @@
         }
         a.add-divida:hover {
             background-color: #219150;
+        }
+        /* Botão para dívidas próximas */
+        a.ver-proximos {
+            display: block;
+            width: 300px;
+            margin: 0 auto 25px auto;
+            padding: 10px;
+            background-color: #f39c12;
+            color: white;
+            font-weight: 700;
+            text-align: center;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        a.ver-proximos:hover {
+            background-color: #d68910;
         }
         ul {
             max-width: 600px;
@@ -75,27 +92,26 @@
             margin-left: 20px;
             white-space: nowrap;
         }
-
         .btn-excluir {
-      background-color: #c0392b;
-      color: white;
-      padding: 8px 14px;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: 600;
-      transition: background-color 0.3s ease;
-      margin-left: 15px;
-      white-space: nowrap;
-    }
-    .btn-excluir:hover {
-      background-color: #992d22;
-    }
-
+            background-color: #c0392b;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            margin-left: 15px;
+            white-space: nowrap;
+        }
+        .btn-excluir:hover {
+            background-color: #992d22;
+        }
     </style>
 </head>
 <body>
     <h1>📄 Lista de Dívidas</h1>
     <a href="{{ url_for('adicionar') }}" class="add-divida">➕ Adicionar nova dívida</a>
+    <a href="{{ url_for('vencimentos_proximos') }}" class="ver-proximos">Ver dívidas com vencimento em até 10 dias</a>
     <ul>
         {% for divida in dividas %}
             {% set i = loop.index0 %}

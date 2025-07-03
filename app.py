@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 app = Flask(__name__)
 ARQUIVO = "dividas.json"
@@ -46,7 +47,8 @@ def adicionar():
             "valor": float(request.form["valor"]),
             "vencimento": vencimento_formatado,
             "prioridade": request.form["prioridade"],
-            "paga": False
+            "paga": False,
+            "repetir": request.form.get("repetir") == "on"
         }
 
         lista = carregar_dados()
@@ -55,11 +57,43 @@ def adicionar():
         return redirect(url_for("index"))
     return render_template("adicionar.html")
 
+@app.route("/vencimentos-proximos")
+def vencimentos_proximos():
+    hoje = datetime.now()
+    limite = hoje + timedelta(days=10)
+
+    lista = carregar_dados()
+    proximas = []
+
+    for divida in lista:
+        try:
+            data = interpretar_data(divida["vencimento"])
+            if hoje <= data <= limite and not divida["paga"]:
+                proximas.append(divida)
+        except:
+            continue
+
+    return render_template("proximos.html", dividas=proximas)
+
 @app.route("/pagar/<int:indice>")
 def pagar(indice):
     lista = carregar_dados()
     if 0 <= indice < len(lista):
-        lista[indice]["paga"] = True
+        divida = lista[indice]
+        divida["paga"] = True
+
+        # Se ela se repete, cria nova para o próximo mês
+        if divida.get("repetir"):
+            try:
+                data_antiga = interpretar_data(divida["vencimento"])
+                nova_data = data_antiga + relativedelta(months=1)
+                nova_divida = divida.copy()
+                nova_divida["vencimento"] = nova_data.strftime("%d/%m/%Y")
+                nova_divida["paga"] = False
+                lista.append(nova_divida)
+            except:
+                pass
+
         salvar_dados(lista)
     return redirect(url_for("index"))
 
@@ -73,4 +107,4 @@ def excluir(indice):
     return redirect(url_for("index"))
 
 if __name__ == "__main__":
-     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
